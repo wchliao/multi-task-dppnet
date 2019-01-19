@@ -179,7 +179,14 @@ class BaseController:
         return samples, accs
 
 
-    def eval(self, train_data, test_data, configs, path='saved_models/default'):
+    def eval(self,
+             train_data,
+             test_data,
+             configs,
+             save=True,
+             path='saved_models/default'
+             ):
+
         architectures, _ = self.load(path)
         accs = []
         model_sizes = []
@@ -196,6 +203,9 @@ class BaseController:
 
             accs.append(accuracy)
             model_sizes.append(model.size)
+
+        if save:
+            self.save(architectures, accs, os.path.join(path, 'eval'))
 
         accs_order = np.argsort(accs)[::-1]
 

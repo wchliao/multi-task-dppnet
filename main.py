@@ -93,7 +93,9 @@ def evaluate(args):
 
     best_architectures, results = agent.eval(train_data=train_data,
                                              test_data=test_data,
-                                             configs=configs
+                                             configs=configs,
+                                             save=args.save,
+                                             path=args.path
                                              )
 
     for architecture, result in zip(best_architectures, results):
