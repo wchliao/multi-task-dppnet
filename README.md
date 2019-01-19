@@ -37,4 +37,5 @@ Arguments:
  * `--data`: (default: `1`)
    * `1`: CIFAR-100
  * `--task`: Task ID (for type `1`) (default: None)
+ * `--save`: A flag used to decide whether to save evaluation models or not.
  * `--path`: Path (directory) that model and history are saved. (default: `'saved_models/default/'`)
