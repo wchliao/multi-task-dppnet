@@ -1,0 +1,10 @@
+.idea/
+__pycache__/
+data/
+saved_models/
+saved_images/
+plot/
+others/
+
+run.py
+test.py

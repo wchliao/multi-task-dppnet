@@ -1,0 +1,13 @@
+agent:
+  num_epochs: 1000
+  num_models: 256
+  num_candidate_models: 1024
+
+predictor:
+  num_epochs: 300
+  learning_rate: 0.008
+
+model:
+  batch_size: 128
+  num_epochs: 20
+  learning_rate: 0.1

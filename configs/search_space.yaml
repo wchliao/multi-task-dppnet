@@ -1,0 +1,16 @@
+- type: conv
+  kernel_size: 1
+- type: conv
+  kernel_size: 3
+- type: conv
+  kernel_size: 5
+- type: depthwise-conv
+  kernel_size: 3
+- type: depthwise-conv
+  kernel_size: 5
+- type: avg-pool
+  kernel_size: 3
+- type: max-pool
+  kernel_size: 3
+- type: identity
+  kernel_size: 1
