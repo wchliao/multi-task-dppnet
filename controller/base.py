@@ -205,8 +205,6 @@ class BaseController:
 
         results = [{'Accuracy': acc, 'Model size': model_size} for acc, model_size in zip(accs, model_sizes)]
 
-        print(len(architectures), len(accs), len(model_sizes), len(results))
-
         return architectures, results
 
 
