@@ -46,7 +46,7 @@ class _CoreModel(nn.Module):
 
 
 def SingleTaskCoreModel(layers, architecture, task_info):
-    _layers = [ShareLayer(layer=layer, share=[0]) for layer in layers]
+    _layers = [ShareLayer(layer=layer, share=False) for layer in layers]
     _layers = _build_layers(layers=_layers,
                             architecture=architecture,
                             num_tasks=1,
@@ -75,18 +75,17 @@ def _build_layers(layers, architecture, num_channels, num_tasks):
         stride = args.stride
 
         if layer.layer.type == 'conv':
-            shared_layer = nn.Conv2d(in_channels,
-                                     out_channels,
-                                     kernel_size=kernel_size,
-                                     padding=padding,
-                                     stride=stride
-                                     )
-
-            for model, share in zip(models, layer.share):
-                if share:
+            if layer.share:
+                shared_layer = nn.Conv2d(in_channels,
+                                         out_channels,
+                                         kernel_size=kernel_size,
+                                         padding=padding,
+                                         stride=stride
+                                         )
+                for model in models:
                     model.append(shared_layer)
-                    model.append(nn.BatchNorm2d(out_channels))
-                else:
+            else:
+                for model in models:
                     _layer = nn.Conv2d(in_channels,
                                        out_channels,
                                        kernel_size=kernel_size,
@@ -97,26 +96,26 @@ def _build_layers(layers, architecture, num_channels, num_tasks):
                     model.append(nn.BatchNorm2d(out_channels))
 
         elif layer.layer.type == 'depthwise-conv':
-            shared_layer1 = nn.Conv2d(in_channels,
-                                      in_channels,
-                                      kernel_size=kernel_size,
-                                      padding=padding,
-                                      stride=stride,
-                                      groups=in_channels
-                                      )
-            shared_layer2 = nn.Conv2d(in_channels,
-                                      out_channels,
-                                      kernel_size=1,
-                                      padding=0,
-                                      stride=1
-                                      )
-
-            for model, share in zip(models, layer.share):
-                if share:
+            if layer.share:
+                shared_layer1 = nn.Conv2d(in_channels,
+                                          in_channels,
+                                          kernel_size=kernel_size,
+                                          padding=padding,
+                                          stride=stride,
+                                          groups=in_channels
+                                          )
+                shared_layer2 = nn.Conv2d(in_channels,
+                                          out_channels,
+                                          kernel_size=1,
+                                          padding=0,
+                                          stride=1
+                                          )
+                for model in models:
                     model.append(shared_layer1)
                     model.append(shared_layer2)
                     model.append(nn.BatchNorm2d(out_channels))
-                else:
+            else:
+                for model in models:
                     _layer1 = nn.Conv2d(in_channels,
                                         in_channels,
                                         kernel_size=kernel_size,
@@ -140,7 +139,7 @@ def _build_layers(layers, architecture, num_channels, num_tasks):
                                         stride=stride
                                         )
 
-            for model, share in zip(models, layer.share):
+            for model in models:
                 model.append(shared_layer)
 
             if in_channels != out_channels:
@@ -152,7 +151,7 @@ def _build_layers(layers, architecture, num_channels, num_tasks):
                                         stride=stride
                                         )
 
-            for model, share in zip(models, layer.share):
+            for model in models:
                 model.append(shared_layer)
 
             if in_channels != out_channels:
@@ -169,7 +168,7 @@ def _build_layers(layers, architecture, num_channels, num_tasks):
             model.append(nn.ReLU())
 
         in_channels = out_channels
-    
+
     # Remove last ReLU
 
     models = [model[:-1] for model in models]

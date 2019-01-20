@@ -8,7 +8,6 @@ import json
 import pickle
 import utils
 from model import SingleTaskModel, MultiTaskModel
-from utils import estimate_single_task_model_size, estimate_multi_task_model_size
 
 
 class BaseController:
@@ -17,10 +16,8 @@ class BaseController:
 
         if multi_task:
             self.build_model = MultiTaskModel
-            self.estimate_model_size = estimate_multi_task_model_size
         else:
             self.build_model = SingleTaskModel
-            self.estimate_model_size = estimate_single_task_model_size
 
         self.architecture = architecture
         self.task_info = task_info
@@ -135,10 +132,11 @@ class BaseController:
                 model_sizes = []
                 for architecture in best_architectures:
                     layers = [self.search_space[ID] for ID in architecture]
-                    model_sizes.append(self.estimate_model_size(layers=layers,
-                                                                architecture=self.architecture[:num_layers + 1],
-                                                                num_channels=self.task_info.num_channels
-                                                                )
+                    model_sizes.append(utils.estimate_model_size(layers=layers,
+                                                                 num_tasks=self.task_info.num_tasks,
+                                                                 architecture=self.architecture[:num_layers + 1],
+                                                                 num_channels=self.task_info.num_channels
+                                                                 )
                                        )
 
                 objectives = [(acc, -model_size) for (acc, model_size) in zip(accs, model_sizes)]

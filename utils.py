@@ -1,4 +1,5 @@
 import numpy as np
+from namedtuple import ShareLayer
 
 
 def permutations(num_new_items, inputs=None):
@@ -83,50 +84,30 @@ def _batchnorm_size(num_channels):
     return num_channels * 4
 
 
-def estimate_single_task_model_size(layers, architecture, num_channels):
+def _layer_size(layer, in_channels, out_channels, kernel_size):
+    if layer.type == 'conv':
+        return _conv_size(in_channels, out_channels, kernel_size) + _batchnorm_size(out_channels)
+    elif layer.type == 'depthwise-conv':
+        return _depthwise_conv_size(in_channels, out_channels, kernel_size) + _batchnorm_size(out_channels)
+    else:
+        return 0
+
+
+def estimate_model_size(layers, num_tasks, architecture, num_channels):
+    if num_tasks == 1:
+        layers = [ShareLayer(layer=layer, share=False) for layer in layers]
+
     size = 0
     in_channels = num_channels
 
     for layer, args in zip(layers, architecture):
         out_channels = args.num_channels
-        kernel_size = layer.kernel_size
+        kernel_size = layer.layer.kernel_size
 
-        if layer.type == 'conv':
-            size += _conv_size(in_channels, out_channels, kernel_size)
-            size += _batchnorm_size(out_channels)
-        elif layer.type == 'depthwise-conv':
-            size += _depthwise_conv_size(in_channels, out_channels, kernel_size)
-            size += _batchnorm_size(out_channels)
-
-        in_channels = out_channels
-
-    return size
-
-
-def estimate_multi_task_model_size(layers, architecture, num_channels):
-    size = 0
-    in_channels = num_channels
-
-    for layer, args in zip(layers, architecture):
-        shares = layer.share
-        layer = layer.layer
-        out_channels = args.num_channels
-        kernel_size = layer.kernel_size
-
-        layer_size = 0
-        if layer.type == 'conv':
-            layer_size += _conv_size(in_channels, out_channels, kernel_size)
-            layer_size += _batchnorm_size(out_channels)
-        elif layer.type == 'depthwise-conv':
-            layer_size += _depthwise_conv_size(in_channels, out_channels, kernel_size)
-            layer_size += _batchnorm_size(out_channels)
-
-        if sum(shares) > 0:
-            size += layer_size
-
-        for share in shares:
-            if not share:
-                size += layer_size
+        if layer.share:
+            size += _layer_size(layer.layer, in_channels, out_channels, kernel_size)
+        else:
+            size += _layer_size(layer.layer, in_channels, out_channels, kernel_size) * num_tasks
 
         in_channels = out_channels
 

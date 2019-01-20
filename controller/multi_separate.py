@@ -5,7 +5,7 @@ from search_space import search_space as layers
 
 class MultiTaskControllerSeparate(BaseController):
     def __init__(self, architecture, task_info):
-        search_space = [ShareLayer(layer=layer, share=[0 for _ in range(task_info.num_tasks)]) for layer in layers]
+        search_space = [ShareLayer(layer=layer, share=False) for layer in layers]
 
         super(MultiTaskControllerSeparate, self).__init__(multi_task=True,
                                                           architecture=architecture,
