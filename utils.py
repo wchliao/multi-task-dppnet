@@ -104,4 +104,30 @@ def estimate_single_task_model_size(layers, architecture, num_channels):
 
 
 def estimate_multi_task_model_size(layers, architecture, num_channels):
-    raise NotImplementedError
+    size = 0
+    in_channels = num_channels
+
+    for layer, args in zip(layers, architecture):
+        shares = layer.share
+        layer = layer.layer
+        out_channels = args.num_channels
+        kernel_size = layer.kernel_size
+
+        layer_size = 0
+        if layer.type == 'conv':
+            layer_size += _conv_size(in_channels, out_channels, kernel_size)
+            layer_size += _batchnorm_size(out_channels)
+        elif layer.type == 'depthwise-conv':
+            layer_size += _depthwise_conv_size(in_channels, out_channels, kernel_size)
+            layer_size += _batchnorm_size(out_channels)
+
+        if sum(shares) > 0:
+            size += layer_size
+
+        for share in shares:
+            if not share:
+                size += layer_size
+
+        in_channels = out_channels
+
+    return size

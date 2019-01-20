@@ -6,7 +6,6 @@ from namedtuple import ShareLayer
 class _InputLayer(nn.Module):
     def __init__(self, layers):
         super(_InputLayer, self).__init__()
-
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -19,12 +18,7 @@ class _InputLayer(nn.Module):
 class _OutputLayer(nn.Module):
     def __init__(self, input_size, output_size):
         super(_OutputLayer, self).__init__()
-        self.layers = nn.Sequential(
-            nn.Linear(input_size, 512),
-            nn.BatchNorm1d(512),
-            nn.ReLU(),
-            nn.Linear(512, output_size)
-        )
+        self.layers = nn.Linear(input_size, output_size)
 
     def forward(self, x):
         x = self.layers(x)

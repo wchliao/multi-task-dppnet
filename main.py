@@ -2,7 +2,7 @@ import argparse
 import yaml
 from namedtuple import TaskInfo, AgentConfigs, PredictorConfigs, ModelConfigs, Configs, LayerArguments
 from data_loader import CIFAR100Loader
-from controller import SingleTaskController
+from controller import SingleTaskController, MultiTaskControllerSeparate, MultiTaskControllerShare, MultiTaskControllerFull
 
 
 def parse_args():
@@ -12,7 +12,10 @@ def parse_args():
     mode.add_argument('--train', action='store_true')
     mode.add_argument('--eval', action='store_true')
 
-    parser.add_argument('--type', type=int, default=1, help='1: Single task experiment \n')
+    parser.add_argument('--type', type=int, default=4, help='1: Single task experiment \n'
+                                                            '2: Multi-task experiment without shared components \n'
+                                                            '3: Multi-task experiment with only shared components \n'
+                                                            '4: Multi-task experiment with full search space')
     parser.add_argument('--data', type=int, default=1, help='1: CIFAR-100')
     parser.add_argument('--task', type=int, default=None)
 
@@ -48,8 +51,21 @@ def train(args):
         train_data = train_data.get_loader(args.task)
         valid_data = valid_data.get_loader(args.task)
 
-        agent = SingleTaskController(architecture=architecture, task_info=task_info)
+    else:
+        task_info = TaskInfo(image_size=train_data.image_size,
+                             num_classes=train_data.num_classes,
+                             num_channels=train_data.num_channels,
+                             num_tasks=num_tasks
+                             )
 
+    if args.type == 1:
+        agent = SingleTaskController(architecture=architecture, task_info=task_info)
+    elif args.type == 2:
+        agent = MultiTaskControllerSeparate(architecture=architecture, task_info=task_info)
+    elif args.type == 3:
+        agent = MultiTaskControllerShare(architecture=architecture, task_info=task_info)
+    elif args.type == 4:
+        agent = MultiTaskControllerFull(architecture=architecture, task_info=task_info)
     else:
         raise ValueError('Unknown setting: {}'.format(args.setting))
 
@@ -86,8 +102,21 @@ def evaluate(args):
         train_data = train_data.get_loader(args.task)
         test_data = test_data.get_loader(args.task)
 
-        agent = SingleTaskController(architecture=architecture, task_info=task_info)
+    else:
+        task_info = TaskInfo(image_size=train_data.image_size,
+                             num_classes=train_data.num_classes,
+                             num_channels=train_data.num_channels,
+                             num_tasks=num_tasks
+                             )
 
+    if args.type == 1:
+        agent = SingleTaskController(architecture=architecture, task_info=task_info)
+    elif args.type == 2:
+        agent = MultiTaskControllerSeparate(architecture=architecture, task_info=task_info)
+    elif args.type == 3:
+        agent = MultiTaskControllerShare(architecture=architecture, task_info=task_info)
+    elif args.type == 4:
+        agent = MultiTaskControllerFull(architecture=architecture, task_info=task_info)
     else:
         raise ValueError('Unknown setting: {}'.format(args.setting))
 
@@ -105,6 +134,7 @@ def evaluate(args):
         for key, value in result.items():
             print('{}: {}'.format(key, value))
         print()
+
 
 def _load_configs():
     with open('configs/train.yaml', 'r') as f:

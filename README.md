@@ -16,6 +16,9 @@ Arguments:
 
  * `--type`: (default: `1`)
    * `1`: Train a multi-task DPP-Net agent for task *i* model.
+   * `2`: Train a multi-task DPP-Net agent for multi-task model using search space without shared components.
+   * `3`: Train a multi-task DPP-Net agent for multi-task model using search space with only shared components.
+   * `4`: Train a multi-task DPP-Net agent for multi-task model using full search space.
  * `--data`: (default: `1`)
    * `1`: CIFAR-100
  * `--task`: Task ID (for type `1`) (default: None)
@@ -34,6 +37,9 @@ Arguments:
 
  * `--type`: (default: `1`)
    * `1`: Evaluate a multi-task DPP-Net agent for task *i* model.
+   * `2`: Evaluate a multi-task DPP-Net agent for multi-task model using search space without shared components.
+   * `3`: Evaluate a multi-task DPP-Net agent for multi-task model using search space with only shared components.
+   * `4`: Evaluate a multi-task DPP-Net agent for multi-task model using full search space.
  * `--data`: (default: `1`)
    * `1`: CIFAR-100
  * `--task`: Task ID (for type `1`) (default: None)

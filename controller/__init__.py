@@ -1,1 +1,4 @@
 from .single import SingleTaskController
+from .multi_separate import MultiTaskControllerSeparate
+from .multi_share import MultiTaskControllerShare
+from .multi_full import MultiTaskControllerFull

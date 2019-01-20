@@ -7,8 +7,8 @@ import os
 import json
 import pickle
 import utils
-from model import SingleTaskModel
-from utils import estimate_single_task_model_size
+from model import SingleTaskModel, MultiTaskModel
+from utils import estimate_single_task_model_size, estimate_multi_task_model_size
 
 
 class BaseController:
@@ -16,7 +16,8 @@ class BaseController:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         if multi_task:
-            raise NotImplementedError
+            self.build_model = MultiTaskModel
+            self.estimate_model_size = estimate_multi_task_model_size
         else:
             self.build_model = SingleTaskModel
             self.estimate_model_size = estimate_single_task_model_size
@@ -28,11 +29,19 @@ class BaseController:
 
         convs = []
         non_convs = []
-        for s in search_space:
-            if 'conv' in s.type:
-                convs.append(s)
-            else:
-                non_convs.append(s)
+
+        if multi_task:
+            for s in search_space:
+                if 'conv' in s.layer.type:
+                    convs.append(s)
+                else:
+                    non_convs.append(s)
+        else:
+            for s in search_space:
+                if 'conv' in s.type:
+                    convs.append(s)
+                else:
+                    non_convs.append(s)
 
         self.search_space = convs + non_convs
 
