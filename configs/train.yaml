@@ -1,5 +1,4 @@
 agent:
-  num_epochs: 1000
   num_models: 256
   num_candidate_models: 1024
 
