@@ -101,7 +101,7 @@ class SingleTaskModel(BaseModel):
     @property
     def size(self):
         size = 0
-        for s in self.model.state_dict().values():
-            size += np.prod(s.size())
+        for t in self.model.state_dict().values():
+            size += np.prod(t.size())
 
         return size
