@@ -167,7 +167,7 @@ class BaseController:
                 accs.append(accuracy)
                 model_sizes.append(model.size)
 
-            self.save(architectures, accs, model_sizes, path)
+            self.save(architectures, accs, model_sizes, os.path.join(path, 'final'))
 
 
     def _save_samples(self, samples, accs, path):
@@ -232,20 +232,20 @@ class BaseController:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        with open(os.path.join(path, 'best_architectures.pkl'), 'wb') as f:
+        with open(os.path.join(path, 'architectures.pkl'), 'wb') as f:
             pickle.dump(architectures, f)
-        with open(os.path.join(path, 'best_architectures_accs.json'), 'w') as f:
+        with open(os.path.join(path, 'accs.json'), 'w') as f:
             json.dump(accs, f)
-        with open(os.path.join(path, 'best_architectures_model_sizes.json'), 'w') as f:
+        with open(os.path.join(path, 'model_sizes.json'), 'w') as f:
             json.dump(model_sizes, f)
 
 
     def load(self, path):
-        with open(os.path.join(path, 'best_architectures.pkl'), 'rb') as f:
+        with open(os.path.join(path, 'architectures.pkl'), 'rb') as f:
             architectures = pickle.load(f)
-        with open(os.path.join(path, 'best_architectures_accs.json'), 'r') as f:
+        with open(os.path.join(path, 'accs.json'), 'r') as f:
             accs = json.load(f)
-        with open(os.path.join(path, 'best_architectures_model_sizes.json'), 'r') as f:
+        with open(os.path.join(path, 'model_sizes.json'), 'r') as f:
             model_sizes = json.load(f)
 
         return architectures, accs, model_sizes
