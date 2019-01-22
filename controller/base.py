@@ -149,6 +149,7 @@ class BaseController:
 
             architectures = []
             accs = []
+            model_sizes = []
 
             for architecture in best_architectures:
                 layer_IDs = [self.search_space[ID] for ID in architecture]
@@ -163,8 +164,9 @@ class BaseController:
 
                 architectures.append(layer_IDs)
                 accs.append(accuracy)
+                model_sizes.append(model.size)
 
-            self.save(architectures, accs, path)
+            self.save(architectures, accs, model_sizes, path)
 
 
     def _save_samples(self, samples, accs, path):
@@ -194,7 +196,7 @@ class BaseController:
              path='saved_models/default'
              ):
 
-        architectures, _ = self.load(path)
+        architectures, _, _ = self.load(path)
         accs = []
         model_sizes = []
 
@@ -212,7 +214,7 @@ class BaseController:
             model_sizes.append(model.size)
 
         if save:
-            self.save(architectures, accs, os.path.join(path, 'eval'))
+            self.save(architectures, accs, model_sizes, os.path.join(path, 'eval'))
 
         accs_order = np.argsort(accs)[::-1]
 
@@ -225,23 +227,27 @@ class BaseController:
         return architectures, results
 
 
-    def save(self, architectures, accs, path):
+    def save(self, architectures, accs, model_sizes, path):
         if not os.path.isdir(path):
             os.makedirs(path)
 
         with open(os.path.join(path, 'best_architectures.pkl'), 'wb') as f:
             pickle.dump(architectures, f)
-        with open(os.path.join(path, 'best_accs.json'), 'w') as f:
+        with open(os.path.join(path, 'best_architectures_accs.json'), 'w') as f:
             json.dump(accs, f)
+        with open(os.path.join(path, 'best_architectures_model_sizes.json'), 'w') as f:
+            json.dump(model_sizes, f)
 
 
     def load(self, path):
         with open(os.path.join(path, 'best_architectures.pkl'), 'rb') as f:
             architectures = pickle.load(f)
-        with open(os.path.join(path, 'best_accs.json'), 'r') as f:
+        with open(os.path.join(path, 'best_architectures_accs.json'), 'r') as f:
             accs = json.load(f)
+        with open(os.path.join(path, 'best_architectures_model_sizes.json'), 'r') as f:
+            model_sizes = json.load(f)
 
-        return architectures, accs
+        return architectures, accs, model_sizes
 
 
 class AccuracyPredictor(nn.Module):
