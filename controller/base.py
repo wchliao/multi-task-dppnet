@@ -218,7 +218,7 @@ class BaseController:
 
         accs_order = np.argsort(accs)[::-1]
 
-        architectures = np.array(architectures)[accs_order].tolist()
+        architectures = list(np.array(architectures)[accs_order])
         accs = np.array(accs)[accs_order]
         model_sizes = np.array(model_sizes)[accs_order]
 
