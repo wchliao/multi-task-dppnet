@@ -1,17 +1,16 @@
-import numpy as np
 from namedtuple import ShareLayer
 
 
 def permutations(num_new_items, inputs=None):
     if inputs is None:
-        inputs = np.array([[]], dtype=np.int)
+        inputs = [[]]
 
     out = []
     for input in inputs:
         for i in range(num_new_items):
-            out.append(np.append(input, i))
+            out.append(input + [i])
 
-    return np.array(out)
+    return out
 
 
 def _pareto_dominate(pa, pb):

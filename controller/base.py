@@ -126,6 +126,7 @@ class BaseController:
                 accs = self.predictor.predict(best_architectures).detach().cpu().numpy()
                 accs_order = accs.argsort()[::-1]
 
+                best_architectures = np.array(best_architectures)
                 best_architectures = best_architectures[accs_order][:configs.agent.num_candidate_models]
                 accs = accs[accs_order][:configs.agent.num_candidate_models]
 
@@ -141,7 +142,7 @@ class BaseController:
 
                 objectives = [(acc, -model_size) for (acc, model_size) in zip(accs, model_sizes)]
                 _, idx = utils.pareto_front(objectives, num=configs.agent.num_models)
-                best_architectures = best_architectures[idx]
+                best_architectures = best_architectures[idx].tolist()
 
         if save:
             if verbose:
@@ -173,15 +174,15 @@ class BaseController:
         if not os.path.isdir(path):
             os.makedirs(path)
 
-        with open(os.path.join(path, 'samples.pkl'), 'wb') as f:
-            pickle.dump(samples, f)
+        with open(os.path.join(path, 'samples.json'), 'w') as f:
+            json.dump(samples, f)
         with open(os.path.join(path, 'accs.json'), 'w') as f:
             json.dump(accs, f)
 
 
     def _load_samples(self, path):
-        with open(os.path.join(path, 'samples.pkl'), 'rb') as f:
-            samples = pickle.load(f)
+        with open(os.path.join(path, 'samples.json'), 'r') as f:
+            samples = json.load(f)
         with open(os.path.join(path, 'accs.json'), 'r') as f:
             accs = json.load(f)
 
