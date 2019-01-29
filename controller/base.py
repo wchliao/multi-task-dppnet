@@ -153,8 +153,8 @@ class BaseController:
             model_sizes = []
 
             for architecture in best_architectures:
-                layer_IDs = [self.search_space[ID] for ID in architecture]
-                model = self.build_model(layer_IDs, self.architecture, self.task_info)
+                layers = [self.search_space[ID] for ID in architecture]
+                model = self.build_model(layers, self.architecture, self.task_info)
                 accuracy = model.train(train_data=train_data,
                                        valid_data=valid_data,
                                        num_epochs=configs.model.num_epochs,
@@ -163,7 +163,7 @@ class BaseController:
                                        verbose=False
                                        )
 
-                architectures.append(layer_IDs)
+                architectures.append(layers)
                 accs.append(accuracy)
                 model_sizes.append(model.size)
 
