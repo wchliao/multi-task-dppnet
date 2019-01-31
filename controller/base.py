@@ -197,7 +197,7 @@ class BaseController:
              path='saved_models/default'
              ):
 
-        architectures, _, _ = self.load(path)
+        architectures, _, _ = self.load(os.path.join(path, 'final'))
         accs = []
         model_sizes = []
 
