@@ -49,7 +49,6 @@ class CIFAR100Loader(BaseDataLoader):
                                                     download=True, transform=transform)
             dataloader = torch.utils.data.DataLoader(dataset,
                                                      batch_size=self.batch_size,
-                                                     shuffle=self.shuffle,
                                                      drop_last=self.drop_last)
         else:
             raise ValueError('Unknown data type: {}'.format(type))
